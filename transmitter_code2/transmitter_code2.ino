@@ -25,10 +25,14 @@ void loop()
     hum = dht.readHumidity();
     temp= dht.readTemperature();
   
-    const char *msg = "TEMP:    ";
-    *msg+=temp;
-    *msg+="oC";
-    driver.send((uint8_t *)msg, strlen(msg));
+    String msg = "TEMP:    ";
+    msg+=temp;
+    msg+="oC";
+    
+    char buffer[64];
+    msg.toCharArray(buffer, 64);
+    
+    driver.send((uint8_t *)buffer, strlen(buffer));
     driver.waitPacketSent();
     delay(1000);
 }
