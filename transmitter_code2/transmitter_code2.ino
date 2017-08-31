@@ -29,6 +29,7 @@ void loop()
     msg+=temp;
     msg+="oC";
     
+    // Convert Arduino's fancy string to something that the driver can understand
     char buffer[64];
     msg.toCharArray(buffer, 64);
     
