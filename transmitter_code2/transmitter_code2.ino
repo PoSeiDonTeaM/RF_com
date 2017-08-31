@@ -30,8 +30,9 @@ void loop()
     msg+="oC";
     
     // Convert Arduino's fancy string to something that the driver can understand
-    char buffer[64];
-    msg.toCharArray(buffer, 64);
+    //char buffer[64];
+    //msg.toCharArray(buffer, 64);
+    const char * buffer = "I like toast";
     
     driver.send((uint8_t *)buffer, strlen(buffer));
     driver.waitPacketSent();
