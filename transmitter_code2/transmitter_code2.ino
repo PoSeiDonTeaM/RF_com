@@ -15,24 +15,28 @@ int temp; //Stores temperature value
 void setup()
 {
     Serial.begin(9600);   // Debugging only
+    dht.begin();
     if (!driver.init())
          Serial.println("init failed");
 }
-  dht.begin();
+  
 void loop()
 {
     //Read data and store it to variables hum and temp
     hum = dht.readHumidity();
     temp= dht.readTemperature();
   
-    String msg = "TEMP:    ";
-    msg+=temp;
-    msg+="oC";
+    String msg = "TEMP:       ";
+    msg += temp;
+    msg += "oC";
+    msg += "HUM:         ";
+    msg += hum;
+    msg += "%";
     
     // Convert Arduino's fancy string to something that the driver can understand
-    //char buffer[64];
-    //msg.toCharArray(buffer, 64);
-    const char * buffer = "I like toast";
+    char buffer[64];
+    msg.toCharArray(buffer, 64);
+    //const char * buffer = "I like toast";
     
     driver.send((uint8_t *)buffer, strlen(buffer));
     driver.waitPacketSent();
