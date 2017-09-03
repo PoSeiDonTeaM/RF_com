@@ -24,11 +24,22 @@ void loop()
       
       // Message with a good checksum received, dump it.
       
-      Serial.print("Message: ");
+      Serial.print("Message:  ");
+        
+      int8_t * realbuf = (int8_t*) buf;
       
-      Serial.println((char*)buf);
+      Serial.print("-127: ");
+      Serial.print((int) (buf[0]));
+		
+	  Serial.print(", Temp: ");
+      Serial.print((int) (buf[1]));
+		
+	  Serial.print("oC, Humidity: ");
+      Serial.print((int) (buf[2]));
+		
+	  Serial.println("%");
       lcd.setCursor(0,1);
-      lcd.print((char*)buf);
+      lcd.print("Not Ready Yet");
       
      
      

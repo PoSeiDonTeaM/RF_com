@@ -25,20 +25,15 @@ void loop()
     //Read data and store it to variables hum and temp
     hum = dht.readHumidity();
     temp= dht.readTemperature();
-  
-    String msg = "TEMP:       ";
-    msg += temp;
-    msg += "oC";
-    msg += "HUM:         ";
-    msg += hum;
-    msg += "%";
     
-    // Convert Arduino's fancy string to something that the driver can understand
-    char buffer[64];
-    msg.toCharArray(buffer, 64);
-    //const char * buffer = "I like toast";
-    
-    driver.send((uint8_t *)buffer, strlen(buffer));
+    const int8_t * buffer = {
+        -127, // an identifying value that will not show up in the data
+              // so that we know when the transmission starts
+        (int8_t) temp, // this assumes temperature is between -126 and 127
+        (int8_t) hum // humidity is always between 0 and 100
+    };
+     
+    driver.send((uint8_t *)buffer, 3);
     driver.waitPacketSent();
     delay(1000);
 }
