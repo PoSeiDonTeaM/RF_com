@@ -26,7 +26,7 @@ void loop()
     hum = dht.readHumidity();
     temp= dht.readTemperature();
     
-    const int8_t * buffer = {
+    const int8_t buffer[3] = {
         -127, // an identifying value that will not show up in the data
               // so that we know when the transmission starts
         (int8_t) temp, // this assumes temperature is between -126 and 127
