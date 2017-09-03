@@ -29,13 +29,13 @@ void loop()
       int8_t * realbuf = (int8_t*) buf;
       
       Serial.print("-127: ");
-      Serial.print((int) (buf[0]));
+      Serial.print((int) (realbuf[0]));
 		
 	  Serial.print(", Temp: ");
-      Serial.print((int) (buf[1]));
+      Serial.print((int) (realbuf[1]));
 		
 	  Serial.print("oC, Humidity: ");
-      Serial.print((int) (buf[2]));
+      Serial.print((int) (realbuf[2]));
 		
 	  Serial.println("%");
       lcd.setCursor(0,1);
