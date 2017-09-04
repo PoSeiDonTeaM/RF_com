@@ -5,11 +5,22 @@
 RH_ASK driver;
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
+byte customChar[8] = {
+  0b00111,
+  0b00101,
+  0b00111,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000
+};
+
 void setup()
 {
     Serial.begin(9600); // Debugging only
     lcd.begin(16,2);
-    
+    lcd.createChar(0, customChar);
     if (!driver.init())
          Serial.println("init failed");
 }
@@ -38,11 +49,15 @@ void loop()
       Serial.print((int) (realbuf[2]));
 		
 	  Serial.println("%");
+      lcd.setCursor(0,0);
+      lcd.print("Temperature:");
+      lcd.print((int)(realbuf[1]));
+      lcd.write((uint8_t)0);
+      lcd.print("C");
+
       lcd.setCursor(0,1);
-      lcd.print("Not Ready Yet");
-      
-     
-     
-      
+      lcd.print("Humidity:");
+      lcd.print((int)(realbuf[2]));
+      lcd.print("%");     
     }
 }
