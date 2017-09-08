@@ -22,8 +22,9 @@ void setup()
     lcd.begin(16,2);
     lcd.createChar(0, customChar);
 
+    lcd.clear();
     lcd.setCursor(0,0);
-    lcd.println("Wait signal...");
+    lcd.println("Wait signal...  ");
     Serial.println("wait signal...");
 
     
@@ -36,8 +37,9 @@ int page = 0;
 void loop()
 {
     static int oldpage = page;
+    static bool dataexists = false;
     page = ( (millis()/1000 / 8) % 2 ) ? 0 : 1;
-    if (oldpage != page) { lcd.clear(); oldpage = page; }
+    if (oldpage != page && dataexists) { lcd.clear(); oldpage = page; }
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
@@ -84,7 +86,8 @@ void loop()
         lcd.print("Battery: ");
         lcd.print((int)(r_battery));
         lcd.print("%");
-        }
-    }
+      }
+      dataexists = true;
+    } else { dataexists = false; }
 }
 
