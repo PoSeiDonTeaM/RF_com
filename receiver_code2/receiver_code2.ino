@@ -24,6 +24,7 @@ void setup()
 
     lcd.setCursor(0,0);
     lcd.println("Wait signal...");
+    Serial.println("wait signal...");
 
     
     if (!driver.init())
@@ -34,7 +35,7 @@ int page = 0;
 
 void loop()
 {
-    page = ( (millis()/1000 * 1) % 2 ) ? 0 : 1;
+    page = ( (millis()/1000 / 8) % 2 ) ? 0 : 1;
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
@@ -52,9 +53,9 @@ void loop()
       Serial.print(" ");
       Serial.print((int) (realbuf[3]));
       Serial.print(" ");
-      Serial.print((float) r_level, 2); // 1 decimal accuracy
+      Serial.print((float) r_level, 2);
       Serial.print(" ");
-      Serial.print((int) r_battery);
+      Serial.print((float) r_battery, 2);
       Serial.print(" ");
       Serial.print((int) 0);
 		
@@ -73,14 +74,15 @@ void loop()
         lcd.print("%");     
     } else if (page == 1) {
         lcd.setCursor(0,0);
-        lcd.print("Panel Angle:");
-        lcd.print(r_level);
-        lcd.print((uint8_t)0);  
+        lcd.print("Panels: ");
+        lcd.print(r_level,1);
+        lcd.write((uint8_t)0);  
+        lcd.print("    ");
 
         lcd.setCursor(0,1);
-        lcd.print("Battery:");
+        lcd.print("Battery: ");
         lcd.print((int)(r_battery));
-        lcd.print("%");
+        lcd.print("% ");
         }
     }
 }
