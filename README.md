@@ -1,5 +1,13 @@
 # RF_com
 
+Transmitter pin layout:
+```
+servo      --> 8,10,9,11
+DHT        --> 2
+infrared   --> 6
+transmitter -> 12
+buttons    --> 4,5
+
 PINS Layout: 
 
 ```
