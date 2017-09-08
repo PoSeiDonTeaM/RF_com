@@ -35,7 +35,9 @@ int page = 0;
 
 void loop()
 {
+    static int oldpage = page;
     page = ( (millis()/1000 / 8) % 2 ) ? 0 : 1;
+    if (oldpage != page) { lcd.clear(); oldpage = page; }
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
@@ -77,12 +79,11 @@ void loop()
         lcd.print("Panels: ");
         lcd.print(r_level,1);
         lcd.write((uint8_t)0);  
-        lcd.print("    ");
 
         lcd.setCursor(0,1);
         lcd.print("Battery: ");
         lcd.print((int)(r_battery));
-        lcd.print("% ");
+        lcd.print("%");
         }
     }
 }
