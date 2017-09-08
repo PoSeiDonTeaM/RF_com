@@ -1,4 +1,4 @@
-#define DEBUG 1
+#define DEBUG 0
 
 #include "Stepper.h"
 #if DEBUG
@@ -9,7 +9,7 @@
 /*----- Variables, Pins -----*/
 #define STEPS  32   // Number of steps per revolution of Internal shaft
 int  Steps2Take;  // 2048 = 1 Revolution
-int receiver = 6; // Signal Pin of IR receiver to Arduino Digital Pin 6
+int receiver = 7; // Signal Pin of IR receiver to Arduino Digital Pin 6
 const int STEPPER_PINS[] = { 8, 10, 9, 11};
 int stepsToTake = 256;
 
@@ -61,16 +61,18 @@ void loop()
   #endif
     switch (results.value) {
       case 16: // UP button pressed
+      case 1153:
         small_stepper.step(stepsToTake);
         currentPosition += stepsToTake;
         break;
 
       case 2065: // DOWN button pressed
+      case 3201:
         small_stepper.step(-stepsToTake);
         currentPosition -= stepsToTake;
         break;
 
-      case 107: // RESET button pressed
+      case 97: // RESET button pressed
         digitalWrite(13, HIGH);
         while(currentPosition != 0) {
           if (currentPosition > 0) {

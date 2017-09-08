@@ -19,6 +19,8 @@ DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
 int chk;
 int hum;  //Stores humidity value
 float temp; //Stores temperature value
+float bat; // Stores battery value
+float lvl; // Stores level value
 
 void setup()
 {
@@ -34,17 +36,26 @@ void loop()
     hum = dht.readHumidity();
     temp= dht.readTemperature();
 
+    // Convert to integer and fractional parts
     double tempInt;
     float tempFrac = modf(temp, &tempInt);
+    double batInt;
+    float batFrac = modf(temp, &batInt);
+    double lvlInt;
+    float lvlFrac = modf(temp,&lvlInt);
 
     Serial.print(tempInt); Serial.print("."); Serial.println(tempFrac*256);
     
-    const int8_t buffer[4] = {
+    const int8_t buffer[8] = {
         -127, // an identifying value that will not show up in the data
               // so that we know when the transmission starts
         (int8_t) tempInt, // this assumes temperature is between -126 and 127
         (int8_t) (tempFrac*127), // convert the fractional part to an integer -
                                  // the receiver will have to decode this
+        (int8_t) batInt, // battery is between 0 and 127
+        (int8_t) (batFrac*127),
+        (int8_t) lvlInt, // level is between 0 and 90
+        (int8_t) (lvlFrac*127),
         (int8_t) hum // humidity is always between 0 and 100
     };
      

@@ -30,35 +30,58 @@ void setup()
          Serial.println("init failed");  
 }
 
+int page = 0;
+
 void loop()
 {
+    page = ( (millis()/1000 * 1) % 2 ) ? 0 : 1;
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
     if (driver.recv(buf, &buflen)) { // Non-blocking
       // Message with a good checksum received, dump it.
       
-        
       int8_t * realbuf = (int8_t*) buf;
-      
-      Serial.print((float) (realbuf[1] + realbuf[2]/128.0), 1); // 1 decimal accuracy
+      float r_temperature = (realbuf[1] + realbuf[2]/128.0);
+      float r_level = realbuf[4] + realbuf[5]/128.0;
+      float r_battery = realbuf[6] + realbuf[7]/128.0;
+
+      // serial message format:
+      // temperature humidity level battery
+      Serial.print((float) r_temperature, 1); // 1 decimal accuracy
       Serial.print(" ");
       Serial.print((int) (realbuf[3]));
+      Serial.print(" ");
+      Serial.print((float) r_level, 2); // 1 decimal accuracy
+      Serial.print(" ");
+      Serial.print((int) r_battery);
       Serial.print(" ");
       Serial.print((int) 0);
 		
 	    Serial.println("");
-     
-      lcd.setCursor(0,0);
-      lcd.print("Temperature:");
-      lcd.print((int)(realbuf[1]));
-      lcd.write((uint8_t)0);
-      lcd.print("C");
 
-      lcd.setCursor(0,1);
-      lcd.print("Humidity:");
-      lcd.print((int)(realbuf[3]));
-      lcd.print("%");     
+      if (page == 0) {
+        lcd.setCursor(0,0);
+        lcd.print("Temperature:");
+        lcd.print((int)(realbuf[1]));
+        lcd.write((uint8_t)0);
+        lcd.print("C");
+  
+        lcd.setCursor(0,1);
+        lcd.print("Humidity:");
+        lcd.print((int)(realbuf[3]));
+        lcd.print("%");     
+    } else if (page == 1) {
+        lcd.setCursor(0,0);
+        lcd.print("Panel Angle:");
+        lcd.print(r_level);
+        lcd.print((uint8_t)0);  
+
+        lcd.setCursor(0,1);
+        lcd.print("Battery:");
+        lcd.print((int)(r_battery));
+        lcd.print("%");
+        }
     }
 }
 
