@@ -21,8 +21,13 @@ void setup()
     Serial.begin(9600); // Debugging only
     lcd.begin(16,2);
     lcd.createChar(0, customChar);
+
+    lcd.setCursor(0,0);
+    lcd.println("Wait signal...");
+
+    
     if (!driver.init())
-         Serial.println("init failed");
+         Serial.println("init failed");  
 }
 
 void loop()
@@ -30,25 +35,20 @@ void loop()
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
-    if (driver.recv(buf, &buflen)) // Non-blocking
-    {
-      
+    if (driver.recv(buf, &buflen)) { // Non-blocking
       // Message with a good checksum received, dump it.
       
-      Serial.print("Message:  ");
         
       int8_t * realbuf = (int8_t*) buf;
       
-      Serial.print("-127: ");
-      Serial.print((int) (realbuf[0]));
+      Serial.print((float) (realbuf[1] + realbuf[2]/128.0), 1); // 1 decimal accuracy
+      Serial.print(" ");
+      Serial.print((int) (realbuf[3]));
+      Serial.print(" ");
+      Serial.print((int) 0);
 		
-	  Serial.print(", Temp: ");
-      Serial.print((int) (realbuf[1]));
-		
-	  Serial.print("oC, Humidity: ");
-      Serial.print((int) (realbuf[2]));
-		
-	  Serial.println("%");
+	    Serial.println("");
+     
       lcd.setCursor(0,0);
       lcd.print("Temperature:");
       lcd.print((int)(realbuf[1]));
@@ -57,7 +57,7 @@ void loop()
 
       lcd.setCursor(0,1);
       lcd.print("Humidity:");
-      lcd.print((int)(realbuf[2]));
+      lcd.print((int)(realbuf[3]));
       lcd.print("%");     
     }
 }
