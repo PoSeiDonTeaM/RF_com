@@ -37,6 +37,7 @@ void setup()
   Serial.begin(9600);
   pinMode(13, OUTPUT);
   small_stepper.setSpeed(700);
+  small_stepper.step(512);
 }
 
 void loop()

@@ -24,7 +24,9 @@ void setup()
 
     lcd.clear();
     lcd.setCursor(0,0);
-    lcd.println("Wait signal...  ");
+    lcd.print("Waiting for");
+    lcd.setCursor(0,1);
+    lcd.print("signal...");
     Serial.println("wait signal...");
 
     
@@ -39,7 +41,6 @@ void loop()
     static int oldpage = page;
     static bool dataexists = false;
     page = ( (millis()/1000 / 8) % 2 ) ? 0 : 1;
-    if (oldpage != page && dataexists) { lcd.clear(); oldpage = page; }
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
@@ -51,6 +52,7 @@ void loop()
       float r_level = realbuf[4] + realbuf[5]/128.0;
       float r_battery = realbuf[6] + realbuf[7]/128.0;
 
+      if (oldpage != page) { lcd.clear(); oldpage = page; }
       // serial message format:
       // temperature humidity level battery
       Serial.print((float) r_temperature, 1); // 1 decimal accuracy
@@ -82,10 +84,10 @@ void loop()
         lcd.print(r_level,1);
         lcd.write((uint8_t)0);  
 
-        lcd.setCursor(0,1);
-        lcd.print("Battery: ");
-        lcd.print((int)(r_battery));
-        lcd.print("%");
+        //lcd.setCursor(0,1);
+        //lcd.print("Battery: ");
+        //lcd.print((int)(r_battery));
+        //lcd.print("%");
       }
       dataexists = true;
     } else { dataexists = false; }

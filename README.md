@@ -7,6 +7,7 @@ DHT        --> 2
 infrared   --> 7
 transmitter -> 12
 buttons    --> 4,5
+batterysen --> A0
 
 Receiver pin layout:
 ```
