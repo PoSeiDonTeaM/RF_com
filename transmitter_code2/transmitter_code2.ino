@@ -18,7 +18,7 @@ const float minvolts = 4;
 // 5.62 degrees / 64 steps
 
 const float degsPerStep = 5.625 / 64.0;
-const float lambda = 100/(maxvolts - minvolts);
+const float lambda = 100 / (maxvolts - minvolts);
 const float beta   = - minvolts * lambda;
 
 Stepper small_stepper(STEPS, 8, 10, 9, 11);
@@ -61,59 +61,32 @@ void setup()
 
 void loop()
 {
+  // Store the timestamp of the last transmission so that we can see
+  // when the last transmission was last transmitted
+  static int lastTransmission = millis();
+
   // Adjust the stepper if requested
   //while (digitalRead(5) == HIGH) small_stepper.step(2);
   //while (digitalRead(6) == HIGH) small_stepper.step(-2);
 
-  int sensorValue = analogRead(A0); //read the A0 pin value
-  float voltage = sensorValue * (5.00 / 1023.00) * 3.00; //convert the value to a true voltage.;
-  bat = lambda * voltage + beta;
-
-  digitalWrite(13, HIGH);
-  //Read data and store it to variables hum and temp
-  hum = dht.readHumidity();
-  temp = dht.readTemperature();
-  digitalWrite(13, LOW);
-
-  // Convert to integer and fractional parts
-  double tempInt;
-  float tempFrac = modf(temp, &tempInt);
-  double batInt;
-  float batFrac = modf(temp, &batInt);
-  double lvlInt;
-  float lvlFrac = modf(currentPosition*degsPerStep, &lvlInt);
-
-  Serial.print(hum);
-  Serial.print(" ");
-  Serial.print(currentPosition);
-  Serial.print(" ");
-  Serial.println(temp);
-
-  const int8_t buffer[8] = {
-    -127, // an identifying value that will not show up in the data
-    // so that we know when the transmission starts
-    (int8_t) tempInt, // this assumes temperature is between -126 and 127
-    (int8_t) (tempFrac * 127), // convert the fractional part to an integer -
-    // the receiver will have to decode this
-    (int8_t) hum, // humidity is always between 0 and 100
-    (int8_t) lvlInt, // level is between 0 and 90
-    (int8_t) (lvlFrac * 127),
-    (int8_t) batInt, // battery is between 0 and 127
-    (int8_t) (batFrac * 127)
-  };
+  /*
+    int sensorValue = analogRead(A0); //read the A0 pin value
+    float voltage = sensorValue * (5.00 / 1023.00) * 3.00; //convert the value to a true voltage.;
+    bat = lambda * voltage + beta;
+  */
 
   if (irrecv.decode(&results)) { // have we received an IR signal?
     switch (results.value) {
       case 16: // UP button pressed
       case 1153:
-        small_stepper.step(stepsToTake);
-        currentPosition += stepsToTake;
+        small_stepper.step(-stepsToTake);
+        currentPosition -= stepsToTake;
         break;
 
       case 2065: // DOWN button pressed
       case 3201:
-        small_stepper.step(-stepsToTake);
-        currentPosition -= stepsToTake;
+        small_stepper.step(+stepsToTake);
+        currentPosition += stepsToTake;
         break;
 
       case 97: // RESET button pressed
@@ -134,15 +107,50 @@ void loop()
   }
 
   // Disable stepper motor
-    digitalWrite(11,LOW);
-    digitalWrite(10,LOW);
-    digitalWrite(9, LOW);
-    digitalWrite(8, LOW);
+  digitalWrite(11, LOW);
+  digitalWrite(10, LOW);
+  digitalWrite(9, LOW);
+  digitalWrite(8, LOW);
+
+
+  if (millis() - lastTransmission > 500) {
+    lastTransmission = millis();
+
+    digitalWrite(13, HIGH);
+    //Read data and store it to variables hum and temp
+    hum = dht.readHumidity();
+    temp = dht.readTemperature();
+    digitalWrite(13, LOW);
+
+    // Convert to integer and fractional parts
+    double tempInt;
+    float tempFrac = modf(temp, &tempInt);
+    double batInt;
+    float batFrac = modf(temp, &batInt);
+    double lvlInt;
+    float lvlFrac = modf(currentPosition * degsPerStep, &lvlInt);
+
+    Serial.print(hum);
+    Serial.print(" ");
+    Serial.println(temp);
+
+    const int8_t buffer[8] = {
+      -127, // an identifying value that will not show up in the data
+      // so that we know when the transmission starts
+      (int8_t) tempInt, // this assumes temperature is between -126 and 127
+      (int8_t) (tempFrac * 127), // convert the fractional part to an integer -
+      // the receiver will have to decode this
+      (int8_t) hum, // humidity is always between 0 and 100
+      (int8_t) lvlInt, // level is between 0 and 90
+      (int8_t) (lvlFrac * 127),
+      (int8_t) batInt, // battery is between 0 and 127
+      (int8_t) (batFrac * 127)
+    };
 
     driver.send((uint8_t *)buffer, 8);
     digitalWrite(13, HIGH);
     driver.waitPacketSent();
     digitalWrite(13, LOW);
-    delay(500);
+  }
 }
 
