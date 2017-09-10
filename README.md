@@ -2,7 +2,7 @@
 
 Transmitter pin layout:
 ```
-servo      --> 8,10,9,11
+servo      --> 8,9,10,11
 DHT        --> 2
 infrared   --> 7
 transmitter -> 12
