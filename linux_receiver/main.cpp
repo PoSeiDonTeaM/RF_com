@@ -44,7 +44,7 @@ int main() {
     pot0 = con->prepareStatement("INSERT INTO pot0(value,time) VALUES(?,CURRENT_TIMESTAMP)  ON DUPLICATE KEY UPDATE value = ?");
     pot1 = con->prepareStatement("INSERT INTO pot1(value,time) VALUES(?,CURRENT_TIMESTAMP)  ON DUPLICATE KEY UPDATE value = ?");
     potl = con->prepareStatement("INSERT INTO level(value,time) VALUES(?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE value = ?");
-    potb = con->prepareStatement("INSERT INTO battery(value,time) VALUES(?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE value = ?");
+//    potb = con->prepareStatement("INSERT INTO battery(value,time) VALUES(?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE value = ?");
 
     try {
         // Serial interface initialisation
@@ -87,9 +87,9 @@ int main() {
                         potl->setDouble(1, potvl);
                         potl->setDouble(2, potvl);
                         potl->execute();
-                        potb->setDouble(1, potvb);
-                        potb->setDouble(2, potvb);
-                        potb->execute();
+    //                    potb->setDouble(1, potvb);
+  //                      potb->setDouble(2, potvb);
+      //                  potb->execute();
 
                         last_update = std::chrono::steady_clock::now();
                     }
@@ -115,7 +115,7 @@ int main() {
     delete pot0;
     delete pot1;
     delete potl;
-    delete potb;
+//    delete potb;
     delete con;
 
     return 0;

@@ -1,6 +1,8 @@
 #include <SPI.h> // Not actually used but needed to compile
 #include <IRremote.h>
 #include <Stepper.h>
+#include <DHT.h>
+#include <RH_ASK.h>
 // TODO: fix breaking DHT
 
 /*----- Variables, Pins -----*/
@@ -19,9 +21,17 @@ const float degsPerStep = 5.625 / 64.0;
 const float lambda = 100 / (maxvolts - minvolts);
 const float beta   = - minvolts * lambda;
 
-Stepper small_stepper(STEPS, 8, 10, 9, 11);
+// Forward order: 8 10 9 11
+Stepper small_stepper(STEPS, 11, 9, 10, 8);
 IRrecv irrecv(receiver);    // create instance of 'irrecv'
 decode_results results;
+
+RH_ASK driver;
+
+#define DHTPIN 2     // what pin we're connected to
+#define DHTTYPE DHT11   // DHT 22  (AM2302)
+DHT dht(DHTPIN, DHTTYPE); //// Initialize DHT sensor for normal 16mhz Arduino
+
 
 long currentPosition = 0;
 
@@ -43,6 +53,9 @@ void setup()
 {
   Serial.begin(9600);   // Debugging only
 
+  dht.begin();
+  if (!driver.init()) Serial.println("init failed");
+
   irrecv.enableIRIn(); // Start the receiver
   pinMode(8, OUTPUT);
   pinMode(9, OUTPUT);
@@ -52,12 +65,12 @@ void setup()
   small_stepper.setSpeed(700);
 }
 
+// Store the timestamp of the last transmission so that we can see
+// when the last transmission was last transmitted
+unsigned int lastTransmission;
+
 void loop()
 {
-  // Store the timestamp of the last transmission so that we can see
-  // when the last transmission was last transmitted
-  static int lastTransmission = millis();
-
   // Adjust the stepper if requested
   //while (digitalRead(5) == HIGH) small_stepper.step(2);
   //while (digitalRead(6) == HIGH) small_stepper.step(-2);
@@ -84,10 +97,12 @@ void loop()
         break;
 
       case 97: // RESET button pressed
-        small_stepper.step(512);
+        small_stepper.step(256);
+        currentPosition += 32/degsPerStep;
         break;
       case 2689: // POWER button pressed
         small_stepper.step(-256);
+        currentPosition = 0;
         break;
 
     }
@@ -103,11 +118,44 @@ void loop()
   digitalWrite(8, LOW);
 
 
-  if (millis() - lastTransmission > 500) {
+  if (millis() % 65535 - lastTransmission > 500) {
     lastTransmission = millis();
 
     digitalWrite(13, HIGH);
-    //delay(1);
+    //Read data and store it to variables hum and temp
+    hum = dht.readHumidity();
+    temp = dht.readTemperature();
+    digitalWrite(13, LOW);
+
+    // Convert to integer and fractional parts
+    double tempInt;
+    float tempFrac = modf(temp, &tempInt);
+    double batInt;
+    float batFrac = modf(temp, &batInt);
+    double lvlInt;
+    float lvlFrac = modf(currentPosition * degsPerStep, &lvlInt);
+
+    Serial.print(lastTransmission);
+    Serial.print(" ");
+    Serial.println(hum);
+
+    const int8_t buffer[8] = {
+      -127, // an identifying value that will not show up in the data
+      // so that we know when the transmission starts
+      (int8_t) tempInt, // this assumes temperature is between -126 and 127
+      (int8_t) (tempFrac * 127), // convert the fractional part to an integer -
+      // the receiver will have to decode this
+      (int8_t) hum, // humidity is always between 0 and 100
+      (int8_t) lvlInt, // level is between 0 and 90
+      (int8_t) (lvlFrac * 127),
+      (int8_t) batInt, // battery is between 0 and 127
+      (int8_t) (batFrac * 127)
+    };
+
+    driver.send((uint8_t *)buffer, 8);
+    digitalWrite(13, HIGH);
+    //driver.waitPacketSent();
+    
     digitalWrite(13, LOW);
   }
 }

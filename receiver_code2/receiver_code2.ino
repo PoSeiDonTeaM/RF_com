@@ -29,6 +29,10 @@ void setup()
     lcd.print("signal...");
     Serial.println("wait signal...");
 
+    // Set LED pin for debugging
+    pinMode(13, OUTPUT);
+    pinMode(12, OUTPUT);
+    digitalWrite(13, HIGH);
     
     if (!driver.init())
          Serial.println("init failed");  
@@ -40,12 +44,14 @@ void loop()
 {
     static int oldpage = page;
     static bool dataexists = false;
-    page = ( (millis()/1000 / 8) % 2 ) ? 0 : 1;
+    //page = ( (millis()/1000 / 8) % 2 ) ? 0 : 1;
   
     uint8_t buf[64];
     uint8_t buflen = sizeof(buf);
     if (driver.recv(buf, &buflen)) { // Non-blocking
       // Message with a good checksum received, dump it.
+      digitalWrite(13, HIGH);
+      digitalWrite(12, HIGH);
       
       int8_t * realbuf = (int8_t*) buf;
       float r_temperature = (realbuf[1] + realbuf[2]/128.0);
@@ -90,6 +96,8 @@ void loop()
         //lcd.print("%");
       }
       dataexists = true;
+      digitalWrite(13, LOW);
+      digitalWrite(12, LOW);
     } else { dataexists = false; }
 }
 
