@@ -98,13 +98,12 @@ void loop()
 
       case 97: // RESET button pressed
         small_stepper.step(256);
-        currentPosition += 32/degsPerStep;
+        currentPosition = 32/degsPerStep;
         break;
       case 2689: // POWER button pressed
         small_stepper.step(-256);
         currentPosition = 0;
         break;
-
     }
     digitalWrite(13, LOW);
     Serial.println(results.value);
