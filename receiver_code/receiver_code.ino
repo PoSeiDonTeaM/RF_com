@@ -11,7 +11,7 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 const float transmissions_per_second = 10;
 const float signal_refresh_per_second = 0.2;
 #define MOVING_AVERAGE_COUNT 100
-const bool demo = true;
+const bool demo = false;
 
 bool signalReceived[MOVING_AVERAGE_COUNT];
 
