@@ -12,7 +12,6 @@
 #include <boost/asio.hpp>
 #include <fstream>
 
-const char *port = "/dev/ttyACM0";
 const int update_ms = 300;
 
 int main() {
@@ -30,10 +29,8 @@ int main() {
 
     sql::Driver *driver;
     sql::Connection *con;
-    sql::PreparedStatement *pot0;
-    sql::PreparedStatement *pot1;
-    sql::PreparedStatement *potl;
-    sql::PreparedStatement *potb;
+    sql::PreparedStatement *stMagnetic;
+    sql::PreparedStatement *stSignal;
 
     // MySQL initialisation
     driver = get_driver_instance();
@@ -41,10 +38,8 @@ int main() {
     con->setSchema(database.c_str());
 
     // Prepare insertion statements
-    pot0 = con->prepareStatement("INSERT INTO pot0(value,time) VALUES(?,CURRENT_TIMESTAMP)  ON DUPLICATE KEY UPDATE value = ?");
-    pot1 = con->prepareStatement("INSERT INTO pot1(value,time) VALUES(?,CURRENT_TIMESTAMP)  ON DUPLICATE KEY UPDATE value = ?");
-    potl = con->prepareStatement("INSERT INTO level(value,time) VALUES(?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE value = ?");
-//    potb = con->prepareStatement("INSERT INTO battery(value,time) VALUES(?,CURRENT_TIMESTAMP) ON DUPLICATE KEY UPDATE value = ?");
+    stMagnetic = con->prepareStatement("INSERT INTO mag(value,time) VALUES(?,NOW(2))     ON DUPLICATE KEY UPDATE value = ?");
+    stSignal   = con->prepareStatement("INSERT INTO `signal`(value,time) VALUES(?,NOW(2))  ON DUPLICATE KEY UPDATE value = ?");
 
     try {
         // Serial interface initialisation
@@ -68,28 +63,32 @@ int main() {
                 boost::asio::read_until(serial, buf, '\n', ec);
 
                 if (!ec) {
-                    int potv1 = -2;
-                    float potv0 = -1, potvl = 0, potvb = -3;
+                    float valMagx, valMagy, valMagz, valTemp, valBat, valPressure, valSignal;
                     std::getline(is, line);
                     iss = std::istringstream(line);
-                    iss >> potv0 >> potv1 >> potvl >> potvb;
+                    iss >> valTemp >> valMagx >> valMagy >> valMagz >> valPressure >> valBat >> valSignal;
 
                     if (std::chrono::steady_clock::now() - last_update > std::chrono::milliseconds(update_ms)) {
-                        std::cout << potv0 << '\t' << potv1 << '\t' << potvl << '\t' << potvb << '\t' << '.' << std::endl;
+                        std::cout
+                            << valTemp << '\t'
+                            << valMagx << '\t'
+                            << valMagy << '\t'
+                            << valMagz << '\t'
+                            << valPressure << '\t'
+                            << valBat << '\t'
+                            << valSignal << '\t'
+                            << std::endl;
+
+                        float norm = sqrt(pow(valMagx,2) + pow(valMagy,2) + pow(valMagz,2));
 
                         // Perform the update
-                        pot0->setDouble(1, potv0);
-                        pot0->setDouble(2, potv0);
-                        pot0->execute();
-                        pot1->setInt(1, potv1);
-                        pot1->setInt(2, potv1);
-                        pot1->execute();
-                        potl->setDouble(1, potvl);
-                        potl->setDouble(2, potvl);
-                        potl->execute();
-    //                    potb->setDouble(1, potvb);
-  //                      potb->setDouble(2, potvb);
-      //                  potb->execute();
+                        stMagnetic->setDouble(1, norm);
+                        stMagnetic->setDouble(2, norm);
+                        stMagnetic->execute();
+
+                        stSignal->setDouble(1, valSignal);
+                        stSignal->setDouble(2, valSignal);
+                        stSignal->execute();
 
                         last_update = std::chrono::steady_clock::now();
                     }
@@ -112,10 +111,8 @@ int main() {
         std::cerr << "Unable to open interface " << port << ": " << e.what();
     }
 
-    delete pot0;
-    delete pot1;
-    delete potl;
-//    delete potb;
+    delete stMagnetic;
+    delete stSignal;
     delete con;
 
     return 0;

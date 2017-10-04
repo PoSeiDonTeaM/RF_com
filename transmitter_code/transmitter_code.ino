@@ -1,68 +1,138 @@
 #include <SPI.h> // Not actually used but needed to compile
 #include <RH_ASK.h>
 
+#include <Adafruit_HMC5883_U.h>
+
+/**
+ * Constants
+ */
+const float transmissions_per_second = 10;
+
+/**
+ * Pin definitions
+ */
 #define BME_SCK 8
 #define BME_MISO 11
-#define BME_MOSI 11 
+#define BME_MOSI 11
 #define BME_CS 10
 
-RH_ASK driver;
+/*
+   WIRELESS TRANSMITTER
+*/
+RH_ASK transmitter;
+
+/**
+   MAGNETIC HALL SENSOR
+*/
+Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
 
 int chk;
-int hum;  //Stores humidity value
-float temp; //Stores temperature value
-float bat; // Stores battery value
-float lvl; // Stores level value
+// Values are stored and transmitted in:
+// Magnetic field: uT (microTesla)
+// Temperature: Celsius
+// Pressure: ???
+// Battery: ???
+float mag_x; // Magnetic field X value
+float mag_y; // Magnetic field Y value
+float mag_z; // Magnetic field Z value
+float temp = 25.2; // Temperature
+float pres = 25.1; // Pressure
+float bat = 77.8; // Battery charge level
 
 void setup()
 {
   Serial.begin(9600);   // Debugging only
 
-  if (!driver.init()) Serial.println("init failed");
+  if (!transmitter.init()) Serial.println("RfInit failed");
 
-  Adafruit_BME280 bme; // I2C
+  if (!mag.begin()) Serial.println("MagInit failed");
+  mag.setMagGain(HMC5883_MAGGAIN_8_1);
+
+  pinMode(13, OUTPUT);
 }
 
 // Store the timestamp of the last transmission so that we can see
 // when the last transmission was last transmitted
-unsigned int lastTransmission;
+unsigned long lastTransmission;
+
+/*
+   Magnetic sensor data acquisition
+*/
+void magneticLoop()
+{
+  sensors_event_t event;
+  mag.getEvent(&event);
+
+  mag_x = event.magnetic.x;
+  mag_y = event.magnetic.y;
+  mag_z = event.magnetic.z;
+
+  /*Serial.print("Magnetic data: ");
+  Serial.print(mag_x);
+  Serial.print(" ");
+  Serial.print(mag_y);
+  Serial.print(" ");
+  Serial.print(mag_z);
+  Serial.println();*/
+}
+
+/**
+   Data transmission
+*/
+void rfLoop()
+{
+  temp = random(220, 240) / 10.0;
+
+  // Convert to integer and fractional parts
+  double magxInt;
+  float magxFrac = modf(mag_x, &magxInt);
+  double magyInt;
+  float magyFrac = modf(mag_y, &magyInt);
+  double magzInt;
+  float magzFrac = modf(mag_z, &magzInt);
+  double tempInt;
+  float tempFrac = modf(temp, &tempInt);
+  double batInt;
+  float batFrac = modf(bat, &batInt);
+  double presInt;
+  float presFrac = modf(pres, &presInt);
+
+  /*Serial.println(lastTransmission);
+  Serial.print(" ");*/
+
+  // Create an array with the data that will be sent wirelessly
+  const int8_t buffer[13] = {
+    -127, // an identifying value that will not show up in the data
+    // so that we know when the transmission starts
+    (int8_t) tempInt, // this assumes temperature is between -126 and 127
+    (int8_t) (tempFrac * 127), // convert the fractional part to an integer -
+    // the receiver will have to decode this
+    (int8_t) magxInt, // assuming magnetic field is between 0 and 127
+    (int8_t) (magxFrac * 127),
+    (int8_t) magyInt, // assuming magnetic field is between 0 and 127
+    (int8_t) (magyFrac * 127),
+    (int8_t) magzInt, // assuming magnetic field is between 0 and 127
+    (int8_t) (magzFrac * 127),
+    (int8_t) presInt,
+    (int8_t) (presFrac * 127),
+    (int8_t) batInt, // battery is between 0 and 127
+    (int8_t) (batFrac * 127)
+  };
+
+  transmitter.send((uint8_t *)buffer, 8);
+  //driver.waitPacketSent();
+}
 
 void loop()
 {
-  if (millis() % 65535 - lastTransmission > 100) {
+  if (millis() % 65535 - lastTransmission > 1000.0/transmissions_per_second) {
     lastTransmission = millis();
 
-    temp = random(220,230)/10.0;
+    magneticLoop();
 
-    // Convert to integer and fractional parts
-    double tempInt;
-    float tempFrac = modf(temp, &tempInt);
-    double batInt;
-    float batFrac = modf(temp, &batInt);
-    double lvlInt;
-    float lvlFrac = modf(1 * 2, &lvlInt);
-
-    Serial.print(lastTransmission);
-    Serial.print(" ");
-    Serial.println(hum);
-
-    const int8_t buffer[8] = {
-      -127, // an identifying value that will not show up in the data
-      // so that we know when the transmission starts
-      (int8_t) tempInt, // this assumes temperature is between -126 and 127
-      (int8_t) (tempFrac * 127), // convert the fractional part to an integer -
-      // the receiver will have to decode this
-      (int8_t) hum, // humidity is always between 0 and 100
-      (int8_t) lvlInt, // level is between 0 and 90
-      (int8_t) (lvlFrac * 127),
-      (int8_t) batInt, // battery is between 0 and 127
-      (int8_t) (batFrac * 127)
-    };
-
-    driver.send((uint8_t *)buffer, 8);
+    rfLoop();
     digitalWrite(13, HIGH);
-    //driver.waitPacketSent();
-    
+    delayMicroseconds(400);
     digitalWrite(13, LOW);
   }
 }
