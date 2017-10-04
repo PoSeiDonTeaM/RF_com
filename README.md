@@ -2,11 +2,9 @@
 
 Transmitter pin layout:
 ```
-servo      --> 8,9,10,11
-DHT        --> 2
-infrared   --> 7
 transmitter -> 12
-batterysen --> A0
+magnetic SDA -> SDA
+magnetic SCL -> SCL
 ```
 
 Receiver pin layout:

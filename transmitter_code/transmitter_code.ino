@@ -42,6 +42,7 @@ float bat = 77.8; // Battery charge level
 void setup()
 {
   Serial.begin(9600);   // Debugging only
+  Serial.println("Booting up...");
 
   if (!transmitter.init()) Serial.println("RfInit failed");
 
@@ -49,6 +50,8 @@ void setup()
   mag.setMagGain(HMC5883_MAGGAIN_8_1);
 
   pinMode(13, OUTPUT);
+
+  Serial.println("Init successful");
 }
 
 // Store the timestamp of the last transmission so that we can see
@@ -81,8 +84,6 @@ void magneticLoop()
 */
 void rfLoop()
 {
-  temp = random(220, 240) / 10.0;
-
   // Convert to integer and fractional parts
   double magxInt;
   float magxFrac = modf(mag_x, &magxInt);
@@ -127,7 +128,6 @@ void loop()
 {
   if (millis() % 65535 - lastTransmission > 1000.0/transmissions_per_second) {
     lastTransmission = millis();
-
     magneticLoop();
 
     rfLoop();
