@@ -73,10 +73,15 @@ void loop()
 		
 	    Serial.println("");
 
+      digitalWrite(13, LOW);
+      digitalWrite(12, LOW);
+
       if (page == 0) {
         lcd.setCursor(0,0);
-        lcd.print("Temperature:");
+        lcd.print("Temp: ");
         lcd.print((int)(realbuf[1]));
+        lcd.print(".");
+        lcd.print((int)(realbuf[2]*10/128));
         lcd.write((uint8_t)0);
         lcd.print("C");
   
@@ -96,8 +101,7 @@ void loop()
         //lcd.print("%");
       }
       dataexists = true;
-      digitalWrite(13, LOW);
-      digitalWrite(12, LOW);
+      
     } else { dataexists = false; }
 }
 
