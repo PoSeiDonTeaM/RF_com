@@ -16,7 +16,7 @@ set(SOURCE_FILES main.cpp imgui_impl_glfw.cpp)
 add_executable(LinuxReceiver ${SOURCE_FILES})
 target_link_libraries (LinuxReceiver ImGui ImGuiDemo glfw GL)
 target_link_libraries (LinuxReceiver mysqlcppconn)
-target_link_libraries (LinuxReceiver ${Boost_LIBRARIES})
+target_link_libraries (LinuxReceiver pthread ${Boost_LIBRARIES})
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 #set(CMAKE_CXX_FLAGS "-O3")

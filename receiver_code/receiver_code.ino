@@ -72,7 +72,7 @@ float magfield;
 void loop()
 {
     static int oldpage = page;
-    static bool dataexists = false;
+    static bool dataExists = false;
     //page = ( (millis()/1000 / 2) % 2 ) ? 0 : 1;
 
     if (millis() - lastTime >= (1000.0)/signal_refresh_per_second) {
@@ -85,6 +85,7 @@ void loop()
     uint8_t buflen = sizeof(buf);
     if (driver.recv(buf, &buflen) || demo) { // Non-blocking
       lastCount++;
+      dataExists = true;
       
       // Message with a good checksum received, dump it.
       digitalWrite(13, HIGH);
@@ -128,9 +129,13 @@ void loop()
       digitalWrite(12, LOW);
 
       if (demo) delay(random(1,150));
-    } else { dataexists = false; }
+    }
 
     delay(5);
+
+    if (!dataExists) {
+      return false;
+    }
 
     if (page == 0) {
       lcd.setCursor(0,0);
@@ -159,6 +164,5 @@ void loop()
       lcd.print((int)(r_battery));
       lcd.print("%");
     }
-    dataexists = true;
 }
 
