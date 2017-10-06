@@ -9,11 +9,17 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
  * Constants
  */
 const float transmissions_per_second = 10;
-const float signal_refresh_per_second = 0.2;
-#define MOVING_AVERAGE_COUNT 100
-const bool demo = true;
+const float signal_refresh_per_second = 5;
+#define MOVING_AVERAGE_COUNT 10
+const bool demo = false;
 
-bool signalReceived[MOVING_AVERAGE_COUNT];
+/**
+ * An array to store measured signal strength for small time intervals
+ * These intervals are then averaged out
+ */
+float signalReceived[MOVING_AVERAGE_COUNT] = { 0 };
+int signalReceivedPoint = 0; // The last value added
+float signalAverage = 0;
 
 byte customChar[8] = {
   0b00111,
@@ -79,6 +85,12 @@ void loop()
       lastTime = millis();
       signalStrength = (float) lastCount * signal_refresh_per_second / transmissions_per_second;
       lastCount = 0;
+
+      // Calculate the average of the last MOVING_AVERAGE_COUNT signal strengths
+      signalAverage += (signalStrength - signalReceived[signalReceivedPoint])/( (float) MOVING_AVERAGE_COUNT);
+      // Add the new signal strength to our list
+      signalReceived[signalReceivedPoint] = signalStrength;
+      signalReceivedPoint = (signalReceivedPoint + 1) % MOVING_AVERAGE_COUNT;
     }
   
     uint8_t buf[64];
@@ -140,7 +152,7 @@ void loop()
     if (page == 0) {
       lcd.setCursor(0,0);
       lcd.print(demo ? "d" : "[");
-      int bars = signalStrength * 13;
+      int bars = signalAverage * 13;
       for (int i = 0; i <= 13; i++) {
         if (i < bars) {
           lcd.print("|");
