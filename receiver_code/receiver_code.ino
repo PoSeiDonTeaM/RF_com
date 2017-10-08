@@ -11,7 +11,7 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 const float transmissions_per_second = 10;
 const float signal_refresh_per_second = 5;
 #define MOVING_AVERAGE_COUNT 10
-const bool demo = true;
+const bool demo = false;
 
 /**
  * An array to store measured signal strength for small time intervals
@@ -79,6 +79,9 @@ void loop()
 {
     static int oldpage = page;
     static bool dataExists = false;
+
+    // COMMENT THIS LINE TO STAY ON THE FIRST PAGE
+    // FOREVER
     page = ( (millis()/1000 / 5) % 2 ) ? 0 : 1;
 
     if (millis() - lastTime >= (1000.0)/signal_refresh_per_second) {
