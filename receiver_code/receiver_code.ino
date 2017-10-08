@@ -78,7 +78,7 @@ float magfield;
 void loop()
 {
     static int oldpage = page;
-    static bool dataexists = false;
+    static bool dataExists = false;
     //page = ( (millis()/1000 / 2) % 2 ) ? 0 : 1;
 
     if (millis() - lastTime >= (1000.0)/signal_refresh_per_second) {
@@ -97,6 +97,7 @@ void loop()
     uint8_t buflen = sizeof(buf);
     if (driver.recv(buf, &buflen) || demo) { // Non-blocking
       lastCount++;
+      dataExists = true;
       
       // Message with a good checksum received, dump it.
       digitalWrite(13, HIGH);
@@ -140,39 +141,40 @@ void loop()
       digitalWrite(13, LOW);
       digitalWrite(12, LOW);
 
-      delay(75);
-      //if (demo) delay(random(1,150));
-    } else dataexists = false;
+      if (demo) delay(random(1,150));
+    }
+
+    
+    if (dataExists) {
+      if (page == 0) {
+        lcd.setCursor(0,0);
+        lcd.print(demo ? "d" : "[");
+        int bars = signalAverage * 13;
+        for (int i = 0; i <= 13; i++) {
+          if (i < bars) {
+            lcd.print("|");
+          } else {
+            lcd.print(" ");
+          }
+        }
+        lcd.print(demo ? "d" : "]");
+  
+        lcd.setCursor(0,1);
+        lcd.print("Magnetic: ");
+        lcd.print((float)(magfield));
+    } else if (page == 1) {
+        lcd.setCursor(0,0);
+        lcd.print("Pressure: ");
+        lcd.print(r_pressure,1);
+        lcd.write((uint8_t)0);  
+  
+        lcd.setCursor(0,1);
+        lcd.print("Battery: ");
+        lcd.print((int)(r_battery));
+        lcd.print("%");
+      }
+    }
 
     delay(5);
-
-    if (page == 0) {
-      lcd.setCursor(0,0);
-      lcd.print(demo ? "d" : "[");
-      int bars = signalAverage * 13;
-      for (int i = 0; i <= 13; i++) {
-        if (i < bars) {
-          lcd.print("|");
-        } else {
-          lcd.print(" ");
-        }
-      }
-      lcd.print(demo ? "d" : "]");
-
-      lcd.setCursor(0,1);
-      lcd.print("Magnetic: ");
-      lcd.print((float)(magfield));
-  } else if (page == 1) {
-      lcd.setCursor(0,0);
-      lcd.print("Pressure: ");
-      lcd.print(r_pressure,1);
-      lcd.write((uint8_t)0);  
-
-      lcd.setCursor(0,1);
-      lcd.print("Battery: ");
-      lcd.print((int)(r_battery));
-      lcd.print("%");
-    }
-    dataexists = true;
 }
 
