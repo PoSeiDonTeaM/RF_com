@@ -11,7 +11,7 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 const float transmissions_per_second = 10;
 const float signal_refresh_per_second = 5;
 #define MOVING_AVERAGE_COUNT 10
-const bool demo = false;
+const bool demo = true;
 
 /**
  * An array to store measured signal strength for small time intervals
@@ -113,6 +113,7 @@ void loop()
       if(demo) {
         r_magy = analogRead(A1);
         r_magz = analogRead(A2);
+        r_battery = min(r_battery,5.5) + random(0,100)/1000.0;
       }
 
       magfield = sqrt( pow(r_magx, 2) + pow(r_magy, 2) + pow(r_magz, 2));

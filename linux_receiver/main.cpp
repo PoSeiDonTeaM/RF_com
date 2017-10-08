@@ -56,6 +56,7 @@ void dataAcquisition() {
 
     // Prepare insertion statements
     stMagnetic = con->prepareStatement("INSERT INTO mag(value,time) VALUES(?,NOW(2))     ON DUPLICATE KEY UPDATE value = ?");
+    stBattery  = con->prepareStatement("INSERT INTO battery(value,time) VALUES(?,NOW(2)) ON DUPLICATE KEY UPDATE value = ?");
     stSignal   = con->prepareStatement("INSERT INTO `signal`(value,time) VALUES(?,NOW(2))  ON DUPLICATE KEY UPDATE value = ?");
 
     try {
@@ -106,6 +107,10 @@ void dataAcquisition() {
 
                         stSignal->setDouble(1, valSignal);
                         stSignal->setDouble(2, valSignal);
+                        stSignal->execute();
+
+                        stSignal->setDouble(1, valBat);
+                        stSignal->setDouble(2, valBat);
                         stSignal->execute();
 
                         dataSent = true;
