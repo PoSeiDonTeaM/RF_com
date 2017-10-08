@@ -21,7 +21,7 @@
 const int GRAPH_SIZE = 100;
 
 // The time between different serial data fetches and stores
-const int update_ms = 100;
+const int update_ms = 500;
 
 static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error %d: %s\n", error, description);
@@ -31,6 +31,7 @@ static void error_callback(int error, const char* description) {
 float magneticData[GRAPH_SIZE] = { 0 };
 bool stop = false;
 bool dataReceived = false;
+bool dataSending = false;
 bool dataSent = false;
 
 void dataAcquisition() {
@@ -47,6 +48,7 @@ void dataAcquisition() {
     sql::Driver *driver;
     sql::Connection *con;
     sql::PreparedStatement *stMagnetic;
+    sql::PreparedStatement *stBattery;
     sql::PreparedStatement *stSignal;
 
     // MySQL initialisation
@@ -100,6 +102,8 @@ void dataAcquisition() {
                                 << valSignal << '\t'
                                 << std::endl;
 
+			dataSending = true;
+
                         // Perform the update
                         stMagnetic->setDouble(1, norm);
                         stMagnetic->setDouble(2, norm);
@@ -124,14 +128,14 @@ void dataAcquisition() {
                     }
                     magneticData[GRAPH_SIZE - 1] = norm;
 
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
 
                     if (line == "stop") {
                         break;
                     }
 
                 } else {
-                    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(2));
                 }
             }
             catch (boost::system::system_error &e) {
@@ -149,7 +153,7 @@ void dataAcquisition() {
 }
 
 int main() {
-    std::cout << "Hello, Worlds" << std::endl;
+    std::cout << "Starting" << std::endl;
 
     std::thread dataThread(dataAcquisition);
 
@@ -157,7 +161,7 @@ int main() {
     glfwSetErrorCallback(error_callback);
     if (!glfwInit())
         return 1;
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui OpenGL2 example", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "ASAT CubeSAT Demonstration", NULL, NULL);
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
@@ -194,10 +198,17 @@ int main() {
             ImGui::Checkbox("Data", &dataReceived);
             ImGui::PopStyleColor();
             ImGui::SameLine();
+            ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4({0.9f, 0.2f, 0.05f, 1.0f}));
+            ImGui::Checkbox("", &dataSending);
+            ImGui::PopStyleColor();
+            ImGui::SameLine();
             ImGui::PushStyleColor(ImGuiCol_CheckMark, ImVec4({0.9f, 0.4f, 0.05f, 1.0f}));
             ImGui::Checkbox("Database", &dataSent);
             ImGui::PopStyleColor();
+
+            // Reset indicators so that they light up just for one frame
             dataReceived = false;
+            if (dataSent) dataSending = false;
             dataSent = false;
 
             glBegin(GL_LINE_LOOP);//start drawing a line loop

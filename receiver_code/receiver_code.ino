@@ -140,7 +140,8 @@ void loop()
       digitalWrite(13, LOW);
       digitalWrite(12, LOW);
 
-      if (demo) delay(random(1,150));
+      delay(75);
+      //if (demo) delay(random(1,150));
     } else dataexists = false;
 
     delay(5);
