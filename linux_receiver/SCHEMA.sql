@@ -3,20 +3,14 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Sep 12, 2017 at 08:36 PM
--- Server version: 5.5.53-0ubuntu0.14.04.1
--- PHP Version: 7.1.6-2~ubuntu14.04.1+deb.sury.org+1
+-- Generation Time: Oct 08, 2017 at 04:38 AM
+-- Server version: 10.1.25-MariaDB-
+-- PHP Version: 7.0.22-0ubuntu0.17.04.1
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
 
 --
 -- Database: `arduino`
@@ -32,15 +26,15 @@ CREATE TABLE `battery` (
   `id` int(11) UNSIGNED NOT NULL,
   `value` decimal(7,2) NOT NULL,
   `time` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='temperature';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='battery';
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `level`
+-- Table structure for table `mag`
 --
 
-CREATE TABLE `level` (
+CREATE TABLE `mag` (
   `id` int(11) UNSIGNED NOT NULL,
   `value` decimal(7,2) NOT NULL,
   `time` datetime NOT NULL
@@ -49,26 +43,14 @@ CREATE TABLE `level` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pot0`
+-- Table structure for table `signal`
 --
 
-CREATE TABLE `pot0` (
+CREATE TABLE `signal` (
   `id` int(11) UNSIGNED NOT NULL,
   `value` decimal(7,1) NOT NULL,
   `time` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='temperature';
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pot1`
---
-
-CREATE TABLE `pot1` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `value` int(11) NOT NULL,
-  `time` datetime NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='humidity';
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='signalstrength';
 
 --
 -- Indexes for dumped tables
@@ -82,23 +64,16 @@ ALTER TABLE `battery`
   ADD UNIQUE KEY `time` (`time`);
 
 --
--- Indexes for table `level`
+-- Indexes for table `mag`
 --
-ALTER TABLE `level`
+ALTER TABLE `mag`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `time` (`time`);
 
 --
--- Indexes for table `pot0`
+-- Indexes for table `signal`
 --
-ALTER TABLE `pot0`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `time` (`time`);
-
---
--- Indexes for table `pot1`
---
-ALTER TABLE `pot1`
+ALTER TABLE `signal`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `time` (`time`);
 
@@ -110,27 +85,18 @@ ALTER TABLE `pot1`
 -- AUTO_INCREMENT for table `battery`
 --
 ALTER TABLE `battery`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `level`
+-- AUTO_INCREMENT for table `mag`
 --
-ALTER TABLE `level`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `mag`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `pot0`
+-- AUTO_INCREMENT for table `signal`
 --
-ALTER TABLE `pot0`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
-
---
--- AUTO_INCREMENT for table `pot1`
---
-ALTER TABLE `pot1`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1;
+ALTER TABLE `signal`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

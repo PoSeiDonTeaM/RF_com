@@ -44,11 +44,11 @@
   "hideControls": false,
   "id": null,
   "links": [],
-  "refresh": "1s",
+  "refresh": "10s",
   "rows": [
     {
       "collapse": false,
-      "height": 288,
+      "height": 170,
       "panels": [
         {
           "cacheTimeout": null,
@@ -60,7 +60,7 @@
             "rgba(50, 172, 45, 0.97)"
           ],
           "datasource": "${DS_ARDUINO}",
-          "format": "celsius",
+          "format": "none",
           "gauge": {
             "maxValue": 100,
             "minValue": 0,
@@ -85,9 +85,9 @@
           "maxDataPoints": 100,
           "nullPointMode": "connected",
           "nullText": null,
-          "postfix": "",
+          "postfix": " uT",
           "postfixFontSize": "50%",
-          "prefix": "Average:",
+          "prefix": "",
           "prefixFontSize": "50%",
           "rangeMaps": [
             {
@@ -96,7 +96,7 @@
               "to": "null"
             }
           ],
-          "span": 3,
+          "span": 6,
           "sparkline": {
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
@@ -108,12 +108,12 @@
             {
               "alias": "",
               "format": "time_series",
-              "rawSql": "SELECT\n  UNIX_TIMESTAMP(time) as time_sec,\nvalue as value,\n  \"Temperature\" as metric\nFROM pot0\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
+              "rawSql": "SELECT\nround(UNIX_TIMESTAMP(time)) as time_sec,\nvalue as value,\n  \"Magnetic Field\" as metric\nFROM mag\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
               "refId": "A"
             }
           ],
           "thresholds": "",
-          "title": "Temperature",
+          "title": "Magnetic Field",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -123,12 +123,12 @@
               "value": "null"
             }
           ],
-          "valueName": "avg"
+          "valueName": "current"
         },
         {
           "cacheTimeout": null,
           "colorBackground": false,
-          "colorValue": false,
+          "colorValue": true,
           "colors": [
             "rgba(245, 54, 54, 0.9)",
             "rgba(237, 129, 40, 0.89)",
@@ -176,19 +176,19 @@
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
             "lineColor": "rgb(31, 120, 193)",
-            "show": false
+            "show": true
           },
           "tableColumn": "",
           "targets": [
             {
               "alias": "",
               "format": "time_series",
-              "rawSql": "SELECT\nUNIX_TIMESTAMP(time) as time_sec,\nvalue as value,\n\"Humidity\" as metric\nFROM pot1\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
+              "rawSql": "SELECT\nround(UNIX_TIMESTAMP(time)) as time_sec,\nvalue as value,\n\"Signal\" as metric\nFROM `signal`\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
               "refId": "A"
             }
           ],
-          "thresholds": "",
-          "title": "Humidity",
+          "thresholds": "50,80",
+          "title": "Signal Strength",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -211,91 +211,15 @@
           ],
           "datasource": "${DS_ARDUINO}",
           "decimals": null,
-          "format": "short",
+          "format": "volt",
           "gauge": {
-            "maxValue": 100,
-            "minValue": 0,
-            "show": false,
-            "thresholdLabels": false,
-            "thresholdMarkers": true
-          },
-          "id": 5,
-          "interval": null,
-          "links": [],
-          "mappingType": 1,
-          "mappingTypes": [
-            {
-              "name": "value to text",
-              "value": 1
-            },
-            {
-              "name": "range to text",
-              "value": 2
-            }
-          ],
-          "maxDataPoints": 100,
-          "nullPointMode": "connected",
-          "nullText": null,
-          "postfix": " degrees",
-          "postfixFontSize": "50%",
-          "prefix": "",
-          "prefixFontSize": "50%",
-          "rangeMaps": [
-            {
-              "from": "null",
-              "text": "N/A",
-              "to": "null"
-            }
-          ],
-          "span": 3,
-          "sparkline": {
-            "fillColor": "rgba(31, 118, 189, 0.18)",
-            "full": false,
-            "lineColor": "rgb(31, 120, 193)",
-            "show": false
-          },
-          "tableColumn": "",
-          "targets": [
-            {
-              "alias": "",
-              "format": "time_series",
-              "rawSql": "SELECT\n  UNIX_TIMESTAMP(time) as time_sec,\nvalue as value,\n  \"Angle\" as metric\nFROM level\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
-              "refId": "A"
-            }
-          ],
-          "thresholds": "",
-          "title": "Panel Angle",
-          "type": "singlestat",
-          "valueFontSize": "80%",
-          "valueMaps": [
-            {
-              "op": "=",
-              "text": "N/A",
-              "value": "null"
-            }
-          ],
-          "valueName": "current"
-        },
-        {
-          "cacheTimeout": null,
-          "colorBackground": false,
-          "colorValue": true,
-          "colors": [
-            "rgba(50, 172, 45, 0.97)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(245, 54, 54, 0.9)"
-          ],
-          "datasource": "${DS_ARDUINO}",
-          "decimals": null,
-          "format": "percent",
-          "gauge": {
-            "maxValue": 100,
+            "maxValue": 6,
             "minValue": 0,
             "show": true,
             "thresholdLabels": false,
-            "thresholdMarkers": true
+            "thresholdMarkers": false
           },
-          "id": 6,
+          "id": 5,
           "interval": null,
           "links": [],
           "mappingType": 1,
@@ -328,19 +252,19 @@
             "fillColor": "rgba(31, 118, 189, 0.18)",
             "full": false,
             "lineColor": "rgb(31, 120, 193)",
-            "show": false
+            "show": true
           },
           "tableColumn": "",
           "targets": [
             {
               "alias": "",
               "format": "time_series",
-              "rawSql": "SELECT\n  UNIX_TIMESTAMP(time) as time_sec,\nvalue as value,\n  \"Battery\" as metric\nFROM battery\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
+              "rawSql": "SELECT\nround(UNIX_TIMESTAMP(time)) as time_sec,\nvalue as value,\n  \"Voltage\" as metric\nFROM battery\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
               "refId": "A"
             }
           ],
-          "thresholds": "",
-          "title": "Battery Level",
+          "thresholds": "3,4",
+          "title": "Battery Voltage",
           "type": "singlestat",
           "valueFontSize": "80%",
           "valueMaps": [
@@ -370,88 +294,17 @@
           "dashLength": 10,
           "dashes": false,
           "datasource": "${DS_ARDUINO}",
+          "description": "",
           "fill": 1,
           "id": 3,
           "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 2,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "span": 6,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "alias": "",
-              "format": "time_series",
-              "rawSql": "SELECT\nUNIX_TIMESTAMP(time) as time_sec,\nvalue as value,\n\"Temperature\" as metric\nFROM pot0\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Temperature",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "celsius",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ]
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "${DS_ARDUINO}",
-          "fill": 1,
-          "id": 4,
-          "legend": {
+            "alignAsTable": false,
             "avg": true,
             "current": false,
-            "max": false,
+            "max": true,
             "min": false,
-            "show": true,
+            "rightSide": false,
+            "show": false,
             "total": false,
             "values": true
           },
@@ -465,23 +318,23 @@
           "renderer": "flot",
           "seriesOverrides": [],
           "spaceLength": 10,
-          "span": 6,
+          "span": 12,
           "stack": false,
           "steppedLine": false,
           "targets": [
             {
               "alias": "",
               "format": "time_series",
-              "rawSql": "SELECT\nUNIX_TIMESTAMP(time) as time_sec,\nvalue as value,\n\"Humidity\" as metric\nFROM pot1\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
+              "rawSql": "SELECT\nround(UNIX_TIMESTAMP(time)) as time_sec,\nvalue as value,\n\"Magnetic field\" as metric\nFROM mag\nWHERE $__timeFilter(time)\nORDER BY time ASC\n",
               "refId": "A"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Humidity",
+          "title": "Magnetic Field (uT)",
           "tooltip": {
-            "shared": true,
+            "shared": false,
             "sort": 0,
             "value_type": "individual"
           },
@@ -491,14 +344,16 @@
             "mode": "time",
             "name": null,
             "show": true,
-            "values": []
+            "values": [
+              "total"
+            ]
           },
           "yaxes": [
             {
-              "format": "percent",
+              "format": "short",
               "label": "",
               "logBase": 1,
-              "max": "100",
+              "max": null,
               "min": "0",
               "show": true
             },
@@ -508,7 +363,7 @@
               "logBase": 1,
               "max": null,
               "min": null,
-              "show": true
+              "show": false
             }
           ]
         }
@@ -528,7 +383,7 @@
     "list": []
   },
   "time": {
-    "from": "now-2m",
+    "from": "now-30m",
     "to": "now"
   },
   "timepicker": {
@@ -558,5 +413,5 @@
   },
   "timezone": "",
   "title": "Main",
-  "version": 7
+  "version": 4
 }
