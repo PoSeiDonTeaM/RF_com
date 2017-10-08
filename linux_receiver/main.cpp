@@ -21,7 +21,7 @@
 const int GRAPH_SIZE = 100;
 
 // The time between different serial data fetches and stores
-const int update_ms = 500;
+const int update_ms = 1000;
 
 static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error %d: %s\n", error, description);
@@ -102,7 +102,7 @@ void dataAcquisition() {
                                 << valSignal << '\t'
                                 << std::endl;
 
-			dataSending = true;
+                        dataSending = true;
 
                         // Perform the update
                         stMagnetic->setDouble(1, norm);
@@ -113,9 +113,9 @@ void dataAcquisition() {
                         stSignal->setDouble(2, valSignal);
                         stSignal->execute();
 
-                        stSignal->setDouble(1, valBat);
-                        stSignal->setDouble(2, valBat);
-                        stSignal->execute();
+                        stBattery->setDouble(1, valBat);
+                        stBattery->setDouble(2, valBat);
+                        stBattery->execute();
 
                         dataSent = true;
 
