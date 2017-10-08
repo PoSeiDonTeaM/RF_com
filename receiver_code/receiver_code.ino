@@ -132,7 +132,7 @@ void loop()
       Serial.print(" ");
       Serial.print((float) r_battery, 2);
       Serial.print(" ");
-      Serial.print((float) signalStrength * 100, 1);
+      Serial.print((float) signalAverage * 100, 1);
 		
 	    Serial.println("");
 
