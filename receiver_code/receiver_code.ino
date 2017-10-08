@@ -10,6 +10,7 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
  */
 const float transmissions_per_second = 10;
 const float signal_refresh_per_second = 5;
+const float screen_refresh_per_second = 3;
 #define MOVING_AVERAGE_COUNT 10
 const bool demo = false;
 
@@ -69,6 +70,7 @@ void setup()
 int page = 0;
 
 long lastTime = 0;
+long lastScreenTime = 0;
 unsigned int lastCount = 0;
 float signalStrength;
 
@@ -112,7 +114,8 @@ void loop()
       r_magy = realbuf[5] + realbuf[6]/128.0;
       r_magz = realbuf[7] + realbuf[8]/128.0;
       r_pressure = realbuf[9] + realbuf[10]/128.0;
-      r_battery = realbuf[11] + realbuf[12]/128.0;
+      //r_battery = realbuf[11] + realbuf[12]/128.0;
+      r_battery = r_temperature;
 
       if(demo) {
         r_magy = analogRead(A1);
@@ -148,7 +151,8 @@ void loop()
     }
 
     
-    if (dataExists) {
+    if (dataExists && millis() - lastScreenTime >= (1000.0)/screen_refresh_per_second) {
+      lastScreenTime = millis();
       if (page == 0) {
         lcd.setCursor(0,0);
         lcd.print(demo ? "d" : "[");
@@ -169,7 +173,7 @@ void loop()
         lcd.setCursor(0,0);
         lcd.print("Voltage: ");
         lcd.print(r_battery,1);
-        lcd.write(" mV ");
+        lcd.write(" V ");
   
         lcd.setCursor(0,1);
         lcd.print("Magn (uT): ");

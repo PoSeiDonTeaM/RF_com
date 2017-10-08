@@ -106,6 +106,7 @@ void batteryLoop() {
   result = 1125300L / result; // Calculate Vcc (in mV); 1125300 = 1.1*1023*1000
 
   bat = ((float) result) / 1000.0;
+  temp = bat;
 }
 
 /**
