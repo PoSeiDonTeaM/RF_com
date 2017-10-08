@@ -8,6 +8,7 @@ magnetic SCL -> SCL
 ```
 
 ## Libraries needed
+- https://github.com/PaulStoffregen/RadioHead
 - https://github.com/adafruit/Adafruit_HMC5883_Unified
 - https://github.com/adafruit/Adafruit_Sensor
 
