@@ -79,7 +79,7 @@ void loop()
 {
     static int oldpage = page;
     static bool dataExists = false;
-    //page = ( (millis()/1000 / 2) % 2 ) ? 0 : 1;
+    page = ( (millis()/1000 / 5) % 2 ) ? 0 : 1;
 
     if (millis() - lastTime >= (1000.0)/signal_refresh_per_second) {
       lastTime = millis();
@@ -160,18 +160,17 @@ void loop()
         lcd.print(demo ? "d" : "]");
   
         lcd.setCursor(0,1);
-        lcd.print("Magnetic: ");
+        lcd.print("Magn (uT): ");
         lcd.print((float)(magfield));
     } else if (page == 1) {
         lcd.setCursor(0,0);
-        lcd.print("Pressure: ");
-        lcd.print(r_pressure,1);
-        lcd.write((uint8_t)0);  
+        lcd.print("Voltage: ");
+        lcd.print(r_battery,1);
+        lcd.write(" mV ");
   
         lcd.setCursor(0,1);
-        lcd.print("Battery: ");
-        lcd.print((int)(r_battery));
-        lcd.print("%");
+        lcd.print("Magn (uT): ");
+        lcd.print((float)(magfield));
       }
     }
 
